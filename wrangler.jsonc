@@ -1,0 +1,16 @@
+{
+  "compatibility_date": "2025-04-01",
+  "main": "src/index.ts",
+  "name": "ai-pay-gateway",
+  "upload_source_maps": true,
+  "observability": {
+    "enabled": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ai-pay-gateway-db",
+      "database_id": "db8ed364-f403-48c0-bf2c-2d0114501acb"
+    }
+  ]
+}
