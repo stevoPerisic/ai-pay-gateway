@@ -1,0 +1,8 @@
+{
+  "version": "1",
+  "service": "cf-ai-pay-gateway",
+  "service_desc": "https://gateway.example.com/openapi.json",
+  "token_format": "jwt_cookie",
+  "cookie_name": "cfpay_jwt",
+  "support": "mailto:admin@example.com"
+}
