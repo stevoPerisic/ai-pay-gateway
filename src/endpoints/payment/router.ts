@@ -6,6 +6,6 @@ import { StatusRoute } from './status';
 
 export const paymentRouter = fromHono(new Hono());
 
-paymentRouter.post("/", CheckoutRoute);
-paymentRouter.post("/", RedeemRoute);
-paymentRouter.get("/", StatusRoute);
+paymentRouter.post("/checkout", CheckoutRoute);
+paymentRouter.post("/redeem", RedeemRoute);
+paymentRouter.get("/status", StatusRoute);
