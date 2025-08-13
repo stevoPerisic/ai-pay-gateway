@@ -1,7 +1,7 @@
 // 1) Paywall page
 import { OpenAPIRoute, Str } from 'chanfana'
 
-export class CheckoutRoute extends OpenAPIRoute {
+export class PaywallPageRoute extends OpenAPIRoute {
   static schema = {
     tags: ['ui'],
     summary: 'Human paywall page (HTML)',
