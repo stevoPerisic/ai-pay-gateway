@@ -19,7 +19,7 @@ export class PaywallPageRoute extends OpenAPIRoute {
   async handle(c: any) {
     // const intent = new URL(c.req.url).searchParams.get('why') || 'Access blocked or premium content.'
     // const msg = await aiExplain(c.env, intent)
-    onst msg = "Test PaywallPageRoute"
+    const msg = "Test PaywallPageRoute"
     const html = `
       <!doctype html><html><head><meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
