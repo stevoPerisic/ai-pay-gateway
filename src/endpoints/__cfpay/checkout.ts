@@ -1,5 +1,26 @@
 import { OpenAPIRoute, Str } from 'chanfana'
 
+// Utility: create Stripe checkout session
+async function createStripeCheckout(env: Env, req: Request) {
+  const body = await req.json().catch(() => ({}))
+  const { return_to } = body
+  const successUrl = new URL('/__cfpay/success', req.url)
+  if (return_to) successUrl.searchParams.set('r', return_to)
+
+  const resp = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${env.STRIPE_SECRET}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      mode: 'payment',
+      'line_items[0][price]': env.STRIPE_PRICE_ID,
+      'line_items[0][quantity]': '1',
+      success_url: successUrl.toString(),
+      cancel_url: successUrl.toString() + '&c=1'
+    } as any)
+  })
+  return resp.json()
+}
+
 export class CheckoutPageRoute extends OpenAPIRoute {
   static schema = {
     tags: ['ui'],
@@ -79,11 +100,13 @@ export class CheckoutPageRoute extends OpenAPIRoute {
       return_to = fd?.return_to || '/'
     }
 
-    // Stripe integration placeholder
-    // const session = await createStripeCheckout(c.env, new Request(c.req.url, { method: 'POST', body: JSON.stringify({ return_to }) }))
-    // if (session?.url) return c.redirect(session.url, 302)
-
-    const session = 'Stripe Session placeholder'
-    return c.json({ error: 'stripe_failed', session }, 500)
+    // Stripe integration
+    try {
+      const session = await createStripeCheckout(c.env, new Request(c.req.url, { method: 'POST', body: JSON.stringify({ return_to }) }))
+      if (session?.url) return c.redirect(session.url, 302)
+      return c.json({ error: 'stripe_failed', session }, 500)
+    } catch (e) {
+      return c.json({ error: 'stripe_failed', session: null }, 500)
+    }
   }
 }
