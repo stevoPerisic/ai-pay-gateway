@@ -6,6 +6,7 @@ import { DummyEndpoint } from "./endpoints/dummyEndpoint";
 import { paymentRouter } from "./endpoints/payment/router";
 import { WellKnownDescriptor } from "./endpoints/descriptor/well-known";
 import { PaywallPageRoute } from "./endpoints/__cfpay/paywall";
+import { CheckoutPageRoute } from "./endpoints/__cfpay/checkout";
 
 // Start a Hono app
 const app = new Hono<{ Bindings: Env }>();
@@ -52,7 +53,8 @@ openapi.route("/payment", paymentRouter);
 // Register other endpoints
 openapi.post("/dummy/:slug", DummyEndpoint);
 openapi.get("/.well-known/agent-paywall", WellKnownDescriptor);
-openapi.get("/__cfpay", PaywallPageRoute); 
+openapi.get("/__cfpay/paywall", PaywallPageRoute); 
+openapi.get("/__cfpay/checkout", CheckoutPageRoute); 
 
 // Export the Hono app
 export default app;
