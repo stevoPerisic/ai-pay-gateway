@@ -7,7 +7,7 @@ import { PaywallSuccessRoute } from './success';
 
 export const __cfpayRouter = fromHono(new Hono());
 
-paymentRouter.get("/paywall", PaywallPageRoute); 
-paymentRouter.get("/checkout", CheckoutPageRoute); 
-paymentRouter.get("/payment-webhook", PaymentWebhookRoute);
-paymentRouter.get("/success", PaywallSuccessRoute)
+__cfpayRouter.get("/paywall", PaywallPageRoute); 
+__cfpayRouter.get("/checkout", CheckoutPageRoute); 
+__cfpayRouter.get("/payment-webhook", PaymentWebhookRoute);
+__cfpayRouter.get("/success", PaywallSuccessRoute)
