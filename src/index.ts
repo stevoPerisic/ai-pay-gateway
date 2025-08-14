@@ -33,7 +33,7 @@ app.onError((err, c) => {
 
 // Setup OpenAPI registry
 const openapi = fromHono(app, {
-  docs_url: "/",
+  docs_url: "/docs",
   schema: {
     info: {
       title: "My Awesome API",
@@ -42,6 +42,9 @@ const openapi = fromHono(app, {
     },
   },
 });
+
+// root
+openapi.get("/", async handle(c: any) { return c.json({ ok: 'Root :)' }) });
 
 // Register Tasks Sub router
 openapi.route("/tasks", tasksRouter);
