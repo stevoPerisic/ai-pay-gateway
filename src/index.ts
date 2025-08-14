@@ -45,35 +45,36 @@ const openapi = fromHono(app, {
 
 // root
 openapi.get("/", async (c) => {
-  const url = new URL(c.req.url)
-  const jwtCookie = c.req.header('Cookie')?.match(/cfpay_jwt=([^;]+)/)?.[1]
-  let valid = false
-  if (jwtCookie) {
-    try {
-      await verify(jwtCookie, c.env.PAY_GATEWAY_SECRET)
-      valid = true
-    } catch { valid = false }
-  }
+  return c.json({ ok: true });
+  // const url = new URL(c.req.url)
+  // const jwtCookie = c.req.header('Cookie')?.match(/cfpay_jwt=([^;]+)/)?.[1]
+  // let valid = false
+  // if (jwtCookie) {
+  //   try {
+  //     await verify(jwtCookie, c.env.PAY_GATEWAY_SECRET)
+  //     valid = true
+  //   } catch { valid = false }
+  // }
 
-  // Decide who gets the paywall (replace with your own WAF signal or heuristics)
-  const looksSuspicious =
-    c.req.header('cf-ipcountry') === 'T1' || // Tor
-    (c.req.header('user-agent') || '').includes('curl') ||
-    c.req.header('cf-visitor')?.includes('bot') // just illustrative
+  // // Decide who gets the paywall (replace with your own WAF signal or heuristics)
+  // const looksSuspicious =
+  //   c.req.header('cf-ipcountry') === 'T1' || // Tor
+  //   (c.req.header('user-agent') || '').includes('curl') ||
+  //   c.req.header('cf-visitor')?.includes('bot') // just illustrative
 
-  if (!valid && looksSuspicious && !url.pathname.startsWith('/__cfpay')) {
-    const p = new URL('/__cfpay', url)
-    p.searchParams.set('why', 'Suspicious or premium access required.')
-    return c.redirect(p.toString(), 302)
-  }
+  // if (!valid && looksSuspicious && !url.pathname.startsWith('/__cfpay')) {
+  //   const p = new URL('/__cfpay', url)
+  //   p.searchParams.set('why', 'Suspicious or premium access required.')
+  //   return c.redirect(p.toString(), 302)
+  // }
 
-  // Proxy to origin
-  const upstream = `https://${c.env.ORIGIN_HOST}${url.pathname}${url.search}`
-  return fetch(upstream, {
-    method: c.req.method,
-    headers: Object.fromEntries([...c.req.raw.headers]),
-    body: ['GET','HEAD'].includes(c.req.method) ? undefined : await c.req.arrayBuffer()
-  })
+  // // Proxy to origin
+  // const upstream = `https://${c.env.ORIGIN_HOST}${url.pathname}${url.search}`
+  // return fetch(upstream, {
+  //   method: c.req.method,
+  //   headers: Object.fromEntries([...c.req.raw.headers]),
+  //   body: ['GET','HEAD'].includes(c.req.method) ? undefined : await c.req.arrayBuffer()
+  // })
 });
 
 // Register Tasks Sub router
