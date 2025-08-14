@@ -27,8 +27,9 @@ export class CheckoutPageRoute extends OpenAPIRoute {
       // @ts-ignore
       return_to = fd?.return_to || '/'
     }
-    const session = await createStripeCheckout(c.env, new Request(c.req.url, {method:'POST', body: JSON.stringify({return_to})}))
-    if (session?.url) return c.redirect(session.url, 302)
+    // const session = await createStripeCheckout(c.env, new Request(c.req.url, {method:'POST', body: JSON.stringify({return_to})}))
+    // if (session?.url) return c.redirect(session.url, 302)
+    const session = 'Stripe Session placeholder'
     return c.json({ error: 'stripe_failed', session }, 500)
   }
 }
