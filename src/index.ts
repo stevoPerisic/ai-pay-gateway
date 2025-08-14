@@ -5,7 +5,7 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import { DummyEndpoint } from "./endpoints/dummyEndpoint";
 import { paymentRouter } from "./endpoints/payment/router";
 import { WellKnownDescriptor } from "./endpoints/descriptor/well-known";
-import { PaywallPageRoute } from "./endpoints/__cfpay/index";
+import { PaywallPageRoute } from "./endpoints/__cfpay/paywall";
 
 // Start a Hono app
 const app = new Hono<{ Bindings: Env }>();
