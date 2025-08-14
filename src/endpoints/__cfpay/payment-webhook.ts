@@ -48,16 +48,16 @@ export class PaymentWebhookRoute extends OpenAPIRoute {
 
   async handle(c: any) {
     // NOTE: In production, verify signature using STRIPE_WEBHOOK_SECRET
-    const event = await c.req.json()
-    if (event?.type === 'checkout.session.completed') {
-      const session = event.data.object
-      const subject = session?.customer_details?.email || session?.id || 'anon'
-      // const token = await issueBypass(c.env, subject, 3600)
-      const token = 'dummy token';
-      // store receipt hash → KV
-      // await c.env.KV.put(`receipt:${session.id}`, JSON.stringify({ email: subject, at: Date.now() }), { expirationTtl: 86400*30 })
-      return c.json({ ok: true, token })
-    }
+    // const event = await c.req.json()
+    // if (event?.type === 'checkout.session.completed') {
+    //   const session = event.data.object
+    //   const subject = session?.customer_details?.email || session?.id || 'anon'
+    //   // const token = await issueBypass(c.env, subject, 3600)
+    //   const token = 'dummy token';
+    //   // store receipt hash → KV
+    //   // await c.env.KV.put(`receipt:${session.id}`, JSON.stringify({ email: subject, at: Date.now() }), { expirationTtl: 86400*30 })
+    //   return c.json({ ok: true, token })
+    // }
     return c.json({ ok: true })
   }
 }
