@@ -1,6 +1,6 @@
 // 4) Success endpoint → set cookie, redirect back
 import { OpenAPIRoute, Str } from 'chanfana'
-import ( issueBypass } from './../../lib/issueBypass';
+import { issueBypass } from './../../lib/issueBypass';
 
 export class PaywallSuccessRoute extends OpenAPIRoute {
   static schema = {
