@@ -1,6 +1,6 @@
 // 3) Stripe webhook → issue token
 import { OpenAPIRoute, Str } from 'chanfana';
-import ( issueBypass } from './../../lib/issueBypass';
+import { issueBypass } from './../../lib/issueBypass';
 
 export class PaymentWebhookRoute extends OpenAPIRoute {
   static schema = {
