@@ -1,5 +1,6 @@
 // 4) Success endpoint → set cookie, redirect back
 import { OpenAPIRoute, Str } from 'chanfana'
+import ( issueBypass } from './../../lib/issueBypass';
 
 export class PaywallSuccessRoute extends OpenAPIRoute {
   static schema = {
@@ -33,12 +34,12 @@ export class PaywallSuccessRoute extends OpenAPIRoute {
     const returnPath = url.searchParams.get('r') || '/'
 
     // In production: confirm payment via Stripe API
-    // const token = await issueBypass(c.env, 'temp', 300) // 5 minutes grace
+    const token = await issueBypass(c.env, 'temp', 300) // 5 minutes grace
 
-    // c.header(
-    //   'Set-Cookie',
-    //   `cfpay_jwt=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=300`
-    // )
+    c.header(
+      'Set-Cookie',
+      `cfpay_jwt=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=300`
+    )
 
     return c.redirect(returnPath, 302)
   }
