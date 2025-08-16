@@ -21,7 +21,8 @@ export class PaywallPageRoute extends OpenAPIRoute {
     }
   }
 
-  async function aiExplain(env: Env, intent: string) {
+  // Use a class method, not a function declaration
+  async aiExplain(env: any, intent: string) {
     // Model example: @cf/meta/llama-3.1-8b-instruct
     const res: any = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
       messages: [
@@ -35,8 +36,9 @@ export class PaywallPageRoute extends OpenAPIRoute {
   
   async handle(c: any) {
     const intent = new URL(c.req.url).searchParams.get('why') || 'Access blocked or premium content.'
-    const msg = await aiExplain(c.env, intent)
-    const msg = 'Test PaywallPageRoute'
+    const msg = await this.aiExplain(c.env, intent)
+    // Removed duplicate const msg = 'Test PaywallPageRoute'
+    const originHost = (c.env && c.env.ORIGIN_HOST) ? c.env.ORIGIN_HOST : 'example.com'
     const html = `<!doctype html><html><head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Access Gateway</title>
@@ -54,9 +56,13 @@ export class PaywallPageRoute extends OpenAPIRoute {
         <input type="hidden" name="return_to" value="/">
         <button class="btn" type="submit">Pay $0.50 to continue</button>
       </form>
-      <p class="small">Problems? Contact admin@${c.env.ORIGIN_HOST}</p>
+      <p class="small">Problems? Contact admin@${originHost}</p>
     </body></html>`
 
-    return c.html(html)
+    // Ensure c.html exists, otherwise use new Response
+    if (typeof c.html === 'function') {
+      return c.html(html)
+    }
+    return new Response(html, { headers: { 'Content-Type': 'text/html' }})
   }
 }
