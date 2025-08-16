@@ -12,5 +12,17 @@
       "database_name": "ai-pay-gateway-db",
       "database_id": "db8ed364-f403-48c0-bf2c-2d0114501acb"
     }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "1fada13555574be595cb1a398ee79444"
+    }
+  ],
+  "ai": [
+    {
+      "binding": "AI"
+      // You typically do not need to specify more unless using custom AI providers
+    }
   ]
 }
