@@ -54,7 +54,6 @@ export class PaymentWebhookRoute extends OpenAPIRoute {
       const session = event.data.object
       const subject = session?.customer_details?.email || session?.id || 'anon'
       const token = await issueBypass(c.env, subject, 3600)
-      const token = 'dummy token';
       // store receipt hash → KV
       await c.env.KV.put(`receipt:${session.id}`, JSON.stringify({ email: subject, at: Date.now() }), { expirationTtl: 86400*30 })
       return c.json({ ok: true, token })
