@@ -5,6 +5,7 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import { DummyEndpoint } from "./endpoints/dummyEndpoint";
 import { paymentRouter } from "./endpoints/payment/router";
 import { WellKnownDescriptor } from "./endpoints/descriptor/well-known";
+import { agentChallenge } from './routes/agent-challenge'
 import { __cfpayRouter } from "./endpoints/__cfpay/router";
 
 // Start a Hono app
@@ -43,38 +44,41 @@ const openapi = fromHono(app, {
   },
 });
 
+const isAgent = (req: Request) => {
+  const accept = req.headers.get('accept') || ''
+  const caps = req.headers.get('agent-capabilities') || ''
+  const ua = req.headers.get('user-agent') || ''
+  return accept.includes('application/json') || caps.includes('paywall-v1') || /Agent\//i.test(ua)
+}
+
 // root
 openapi.get("/", async (c) => {
   return c.json({ ok: true });
-  // const url = new URL(c.req.url)
-  // const jwtCookie = c.req.header('Cookie')?.match(/cfpay_jwt=([^;]+)/)?.[1]
-  // let valid = false
-  // if (jwtCookie) {
-  //   try {
-  //     await verify(jwtCookie, c.env.PAY_GATEWAY_SECRET)
-  //     valid = true
-  //   } catch { valid = false }
-  // }
+  const url = new URL(c.req.url)
+  const jwtCookie = c.req.header('Cookie')?.match(/cfpay_jwt=([^;]+)/)?.[1]
+  let valid = false
+  if (jwtCookie) {
+    try {
+      await verify(jwtCookie, c.env.PAY_GATEWAY_SECRET)
+      valid = true
+    } catch { valid = false }
+  }
+  
+  const suspicious = url.pathname.startsWith('/reports/')
+    || ((c.req.header('cf-bot-score') && Number(c.req.header('cf-bot-score')) < 30) ?? false)
+    || (c.req.header('user-agent') || '').includes('curl')
 
-  // // Decide who gets the paywall (replace with your own WAF signal or heuristics)
-  // const looksSuspicious =
-  //   c.req.header('cf-ipcountry') === 'T1' || // Tor
-  //   (c.req.header('user-agent') || '').includes('curl') ||
-  //   c.req.header('cf-visitor')?.includes('bot') // just illustrative
+  const isSystemPath = url.pathname.startsWith('/__cfpay')
+    || url.pathname.startsWith('/.well-known')
+    || url.pathname === '/openapi.json'
+    || url.pathname === '/docs'
+    || url.pathname.startsWith('/__challenge')
 
-  // if (!valid && looksSuspicious && !url.pathname.startsWith('/__cfpay')) {
-  //   const p = new URL('/__cfpay', url)
-  //   p.searchParams.set('why', 'Suspicious or premium access required.')
-  //   return c.redirect(p.toString(), 302)
-  // }
-
-  // // Proxy to origin
-  // const upstream = `https://${c.env.ORIGIN_HOST}${url.pathname}${url.search}`
-  // return fetch(upstream, {
-  //   method: c.req.method,
-  //   headers: Object.fromEntries([...c.req.raw.headers]),
-  //   body: ['GET','HEAD'].includes(c.req.method) ? undefined : await c.req.arrayBuffer()
-  // })
+  if (!valid && suspicious && !isSystemPath) {
+    if (isAgent(c.req.raw)) return c.redirect('/__challenge', 302)
+    return c.redirect('/__cfpay?why=Suspicious%20or%20premium%20access%20required.', 302)
+  }
+  await next()
 });
 
 // Register Tasks Sub router
@@ -88,6 +92,7 @@ openapi.route("/__cfpay", __cfpayRouter);
 
 // Register other endpoints
 openapi.post("/dummy/:slug", DummyEndpoint);
+openapi.all('/__challenge', (c) => agentChallenge(c))
 openapi.get("/.well-known/agent-paywall", WellKnownDescriptor);
 
 
